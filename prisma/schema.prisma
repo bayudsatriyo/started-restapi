@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+
+model User {
+  id      Int      @id @default(autoincrement())
+  email   String   @unique @db.VarChar(100)
+  username String   @unique @db.VarChar(100)
+  fullname    String   @db.VarChar(100)
+  password String? @db.VarChar(100)
+  pekerjaan String? @db.VarChar(100)
+  role String? @db.VarChar(50)
+  profileUrl  String? @db.Text
+  token String? @db.VarChar(500)
+  learningpath userhaslearning[]
+  feedback Feedback[]
+
+  @@map("users")
+}
+
+model Learningpath {
+  id Int @id @default(autoincrement())
+  judul String @unique @db.VarChar(100)
+  imageUrl String @db.Text
+  createAt DateTime @default(now())
+  users userhaslearning[]
+  modul Modul[]
+  kuis Kuis[]
+}
+
+model userhaslearning {
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [useremail], references: [email], onDelete: Cascade, onUpdate: Cascade)
+  useremail String
+  learningpath Learningpath @relation(fields: [learningId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  learningId Int
+  assignedAt DateTime @default(now())
+  skor Int?
+
+  @@index([useremail])
+  @@index([learningId])
+}
+
+model Modul {
+  id Int @id @default(autoincrement())
+  judul String @unique @db.VarChar(100)
+  inti_materi String @db.Text
+  tambahan String? @db.Text
+  gambar String? @db.Text
+  video String? @db.Text
+  createdAt DateTime @default(now())
+  learning Learningpath @relation(fields: [learning_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  learning_id Int
+
+  @@index([learning_id])
+}
+
+model Kuis {
+  id Int @id @default(autoincrement())
+  soal String @db.Text
+  opsi_a String @db.Text
+  opsi_b String @db.Text
+  opsi_c String @db.Text
+  opsi_d String @db.Text
+  jawaban String @db.Char(1)
+  createdAt DateTime @default(now())
+  learning Learningpath @relation(fields: [learning_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  learning_id Int
+
+  @@index([learning_id])
+}
+
+model Feedback {
+  id Int @id @default(autoincrement())
+  note String @db.Text
+  user User @relation(fields: [username], references: [username])
+  username String
+
+  @@index([username])
+}

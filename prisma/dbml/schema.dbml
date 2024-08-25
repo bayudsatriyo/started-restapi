@@ -1,0 +1,79 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table users {
+  id Int [pk, increment]
+  email String [unique, not null]
+  username String [unique, not null]
+  fullname String [not null]
+  password String
+  pekerjaan String
+  role String
+  profileUrl String
+  token String
+  learningpath userhaslearning [not null]
+  feedback Feedback [not null]
+}
+
+Table Learningpath {
+  id Int [pk, increment]
+  judul String [unique, not null]
+  imageUrl String [not null]
+  createAt DateTime [default: `now()`, not null]
+  users userhaslearning [not null]
+  modul Modul [not null]
+  kuis Kuis [not null]
+}
+
+Table userhaslearning {
+  id Int [pk, increment]
+  user users [not null]
+  useremail String [not null]
+  learningpath Learningpath [not null]
+  learningId Int [not null]
+  assignedAt DateTime [default: `now()`, not null]
+  skor Int
+}
+
+Table Modul {
+  id Int [pk, increment]
+  judul String [unique, not null]
+  inti_materi String [not null]
+  tambahan String
+  gambar String
+  video String
+  createdAt DateTime [default: `now()`, not null]
+  learning Learningpath [not null]
+  learning_id Int [not null]
+}
+
+Table Kuis {
+  id Int [pk, increment]
+  soal String [not null]
+  opsi_a String [not null]
+  opsi_b String [not null]
+  opsi_c String [not null]
+  opsi_d String [not null]
+  jawaban String [not null]
+  createdAt DateTime [default: `now()`, not null]
+  learning Learningpath [not null]
+  learning_id Int [not null]
+}
+
+Table Feedback {
+  id Int [pk, increment]
+  note String [not null]
+  user users [not null]
+  username String [not null]
+}
+
+Ref: userhaslearning.useremail > users.email [delete: Cascade]
+
+Ref: userhaslearning.learningId > Learningpath.id [delete: Cascade]
+
+Ref: Modul.learning_id > Learningpath.id [delete: Cascade]
+
+Ref: Kuis.learning_id > Learningpath.id [delete: Cascade]
+
+Ref: Feedback.username > users.username
